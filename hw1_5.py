@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+import cv2
 import GUI_5 as ui
 import matplotlib.pyplot as plt
 import numpy as np
@@ -44,8 +45,8 @@ class Main(QDialog, ui.Ui_Dialog):
         plt.show()
             
     def no2(self):
-        global BatchSize,LR,Opt
-        BatchSize = 32;LR = 0.001;Opt = keras.optimizers.SGD(learning_rate=LR)
+        global BatchSize,Opt
+        BatchSize = 32;LR = 0.01;Opt = keras.optimizers.SGD(learning_rate=LR)
         print('hyperparameters:')
         print('batch size: ',format(BatchSize))
         print('learning rate: ',format(LR))
@@ -60,7 +61,7 @@ class Main(QDialog, ui.Ui_Dialog):
 
         model.add(Conv2D(filters=128, kernel_size=(3,3), padding='same', activation='relu'))
         model.add(Conv2D(filters=128, kernel_size=(3,3), padding='same', activation='relu'))
-        model.add(MaxPool2D(pool_size = (2,2)))
+        #model.add(MaxPool2D(pool_size = (2,2)))
 
         model.add(Conv2D(filters=256, kernel_size=(3,3), padding='same', activation='relu'))
         model.add(Conv2D(filters=256, kernel_size=(3,3), padding='same', activation='relu'))
@@ -70,7 +71,7 @@ class Main(QDialog, ui.Ui_Dialog):
         model.add(Conv2D(filters=512, kernel_size=(3,3), padding='same', activation='relu'))
         model.add(Conv2D(filters=512, kernel_size=(3,3), padding='same', activation='relu'))
         model.add(Conv2D(filters=512, kernel_size=(3,3), padding='same', activation='relu'))
-        model.add(MaxPool2D(pool_size = (2,2)))
+        #model.add(MaxPool2D(pool_size = (2,2)))
 
         model.add(Conv2D(filters=512, kernel_size=(3,3), padding='same', activation='relu'))
         model.add(Conv2D(filters=512, kernel_size=(3,3), padding='same', activation='relu'))
@@ -79,44 +80,51 @@ class Main(QDialog, ui.Ui_Dialog):
 
         model.add(Flatten())
         model.add(Dense(512, activation='relu'))
-        model.add(Dropout(0.5))
+        model.add(Dropout(0.25))
         model.add(Dense(512, activation='relu'))
         model.add(Dropout(0.25))
         model.add(Dense(10, activation='softmax'))
         
         model.summary()
     def no4(self):
+        '''
         trainNor = x_train/255
-        testNor = x_test/255
         trainOnehot = to_categorical(y_train)
-        testOnehot = to_categorical(y_test)
 
         model.compile(loss='categorical_crossentropy', optimizer=Optimizer, metrics=['accuracy'])
-        train_history = model.fit(trainNor,trainOnehot, validation_split=0.1, epochs = 20, batch_size = BatchSize, verbose=1)
+        train_history = model.fit(trainNor,trainOnehot, validation_split=0.2, epochs = 20, batch_size = BatchSize, verbose=1)
         
-        def show_train_history(train_history,train,validation):
-            plt.plot(train_history.history[train])
-            plt.plot(train_history.history[validation])
-            plt.ylabel(train)
-            plt.xlabel('epoch')
-
         plt.subplot(2,1,1)
-        show_train_history(train_history,'accuracy','val_accuracy')
+        plt.plot(train_history.history['accuracy'])
+        plt.plot(train_history.history['val_accuracy'])
+        plt.ylabel('%')
+        plt.xlabel('epoch')
         plt.legend(['Training','Testing'],loc='lower right')
         plt.subplot(2,1,2)
-        show_train_history(train_history,'loss','val_loss')
-        plt.legend(['Training','Testing'],loc='upper right')
+        plt.plot(train_history.history['loss'])
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
         plt.show()
+        '''
+        hw5_4 = cv2.imread('hw1_5_4/20211124.jpg')
+        cv2.imshow('hw5_4',hw5_4)
         
     def no5(self):
+        testNor = x_test/255
+        testOnehot = to_categorical(y_test)
+        modelSaved = keras.models.load_model('model\saved_model')
+        print('model loaded')
+        prediction = np.argmax(modelSaved.predict(testNor),axis=-1)
+        
         testNo = int(self.lineEdit.text())
         count = [0 for i in range(10)]
         for i in range(len(y_test)):
           if y_test[i] == y_test[testNo]:
             count[prediction[i]] += 1
-        plt.figure(0)
-        plt.imshow(x_test[testNo],cmap='binary')
         plt.figure(1)
+        plt.title('label='+label.get(str(y_test[testNo])))
+        plt.imshow(x_test[testNo],cmap='binary')
+        plt.figure(2)
         x = [i for i in range(10)]
         xTicks = ['plane','car','bird','cat','deer','dog','frog','horse','ship','truck']
         plt.bar(x, count, width=0.85, bottom=None, align='center', data=None, color='black')
