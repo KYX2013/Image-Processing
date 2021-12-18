@@ -41,8 +41,49 @@ if __name__ == '__main__':
 ```
 之後要控制UI上的物件，例如:按鈕觸發的程式，也是加在這個主程式
 
----
-## HW1
+___
+### GPU 掛接
+* 如果沒有執行掛接，預設用CPU去跑
+1. 安裝 Cuda & Cudnn
+[Cuda官網](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=11&target_type=exe_local)
+![](https://i.imgur.com/Im5qw8j.png)
+[cuDNN官網 ( cuDNN Archive )](https://developer.nvidia.cn/rdp/cudnn-archive)
+![](https://i.imgur.com/CKPfgFd.png)
+
+    * 尋找對應的版本
+    * [2021/12] 發現有 bug ： CUDA-11.5跟 cuDNN v8.3.0 對不上，需要載 v8.2.1 (for CUDA-11.x)才可以正常運行
+    * 「系統」變數、「環境」參數 加上
+    ![](https://i.imgur.com/quMyFbe.png)
+    
+    打勾應該會自動加上
+    
+    (這次原本裝在D槽，但安裝完成後，自動跳到C槽了)
+
+3. (不確定是否必要)安裝tensorflow-gpu
+```
+pip3 install tensorflow-gpu
+```
+4. 測試
+```python=
+import tensorflow as tf
+print(tf.test.is_gpu_available())
+```
+
+會出現警訊
+![](https://i.imgur.com/1cY4w7P.png)
+和結果
+![](https://i.imgur.com/2WvfFQ1.png)
+
+照著警訊上的建議
+```python=
+import tensorflow as tf
+print(tf.config.list_physical_devices('GPU'))
+```
+![](https://i.imgur.com/y3E1r5E.png)
+若不為空矩陣 => 成功
+(之前根本暴殄天物，放著強大GPU不用)
+___
+## HW1_1
 ### 1.1 Load Image
 利用OpenCV讀取圖片
 [Reference](https://blog.gtwang.org/programming/opencv-basic-image-read-and-write-tutorial/)
@@ -134,6 +175,7 @@ cv2.namedWindow('DOG')
 cv2.createTrackbar('Blend','DOG',0,255,bar)
 cv2.setTrackbarPos('Blend','DOG',127)
 ```
+## HW1_2
 ### 2.1 Gaussian Blur
 Smoothing([reference](https://chtseng.wordpress.com/2016/11/17/python-%E8%88%87-opencv-%E6%A8%A1%E7%B3%8A%E8%99%95%E7%90%86/)) using Gaussian Blur
 ![](https://i.imgur.com/PCDKPPz.png)
@@ -166,6 +208,7 @@ cv2.imshow('pepperSalt',img)
 cv2.imshow('Median(3x3)',blur3)
 cv2.imshow('Median(5x5)',blur5)
 ```
+## HW1_3
 ### 3.1 Gaussian Blur
 ```python=
 img = cv2.imread('Dataset_OpenCvDl_Hw1\Q3_Image\House.jpg')
@@ -240,6 +283,7 @@ sobYnp = np.array(sobY)
 Mag = ((sobXnp**2+sobYnp**2))**(0.5)
 cv2.imshow('Magnitude',Mag)
 ```
+## HW1_4
 ### 4.1 Resize
 [幾何變化1](https://opencv-python-tutorials.readthedocs.io/zh/latest/4.%20OpenCV%E4%B8%AD%E7%9A%84%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86/4.2.%20%E5%9B%BE%E5%83%8F%E7%9A%84%E5%87%A0%E4%BD%95%E5%8F%98%E6%8D%A2/)
 [幾何變化2](https://www.jianshu.com/p/ef67cacf442c)
@@ -307,4 +351,5 @@ cv2.imshow('img_Shearing',imgSh)
 **三種變化用不同的function產生變化矩陣m**
 
 ---
+## HW1_5
 ## HW2
